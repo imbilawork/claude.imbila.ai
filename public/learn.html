@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn AI Fluency &#8212; Claude Academy &#8212; Imbila.AI</title>
+<meta name="description" content="Interactive AI Fluency learning with AI-powered tutoring. Master the 4D Framework with hands-on practice and assessments.">
+<link rel="icon" type="image/png" href="https://www.imbila.ai/content/images/2025/11/New_Honey_200.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{--font:'DM Sans',system-ui,-apple-system,sans-serif;--honey:#EDAF42;--hl:#F5C96E;--hd:#C8922F;--hdp:#A67720;--hw:#FAE0A5;--h10:rgba(237,175,66,.10);--h15:rgba(237,175,66,.15);--bk:#0A0A0A;--g9:#1F1E1E;--g8:#2A2A2A;--g7:#3D3D3D;--g6:#555;--g5:#777;--g4:#999;--g3:#BBB;--g2:#DDD;--g1:#EEE;--g05:#F5F5F5;--wh:#FAFAFA;--ok:#3A9E6B;--err:#D94F4F;--info:#4A90B8}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);color:var(--g8);background:var(--wh);line-height:1.6;min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--g8);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.nav-left{display:flex;align-items:center;gap:12px}.nav-mark{width:28px;height:28px}
+.nav-name{font-size:15px;font-weight:600;color:var(--wh)}.nav-name em{font-style:normal;color:var(--honey)}
+.nav-links{display:flex;align-items:center;gap:24px}
+.nav-links a{font-size:13px;font-weight:500;color:var(--g4);transition:color .2s}.nav-links a:hover{color:var(--wh)}.nav-links a.active{color:var(--honey)}
+.nav-cta{padding:7px 16px!important;background:var(--honey)!important;color:var(--bk)!important;font-weight:600!important;border-radius:100px;transition:background .2s!important}.nav-cta:hover{background:var(--hl)!important}
+.mob{display:none;background:none;border:none;color:var(--wh);font-size:22px;cursor:pointer}
+@media(max-width:768px){.mob{display:block}.nav-links{display:none;position:absolute;top:56px;left:0;right:0;background:var(--bk);flex-direction:column;padding:20px 28px;gap:14px;border-bottom:1px solid var(--g8)}.nav-links.open{display:flex}}
+
+/* LAYOUT */
+.learn-wrap{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 56px)}
+@media(max-width:900px){.learn-wrap{grid-template-columns:1fr}.sidebar{display:none}.sidebar.open{display:block;position:fixed;top:56px;left:0;right:0;bottom:0;z-index:90;overflow-y:auto}}
+.sidebar-toggle{display:none;position:fixed;bottom:20px;left:20px;z-index:95;width:48px;height:48px;border-radius:50%;background:var(--honey);color:var(--bk);border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+@media(max-width:900px){.sidebar-toggle{display:flex;align-items:center;justify-content:center}}
+
+/* SIDEBAR */
+.sidebar{background:var(--bk);color:var(--wh);padding:24px 0;overflow-y:auto;border-right:1px solid var(--g8)}
+.sidebar-header{padding:0 20px 16px;border-bottom:1px solid var(--g8);margin-bottom:8px}
+.sidebar-header h3{font-size:14px;font-weight:700;color:var(--honey);letter-spacing:.05em}
+.sidebar-header p{font-size:12px;color:var(--g5);margin-top:2px}
+.mod-list{list-style:none;padding:0}
+.mod-item{display:flex;align-items:center;gap:10px;padding:12px 20px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--g4);border-left:3px solid transparent}
+.mod-item:hover{background:var(--g9);color:var(--g2)}
+.mod-item.active{background:var(--g9);color:var(--wh);border-left-color:var(--honey)}
+.mod-item.completed{color:var(--ok)}
+.mod-item.completed .mod-status{background:var(--ok);color:var(--wh)}
+.mod-status{width:24px;height:24px;border-radius:50%;border:2px solid var(--g7);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;transition:all .2s}
+.mod-item.active .mod-status{border-color:var(--honey);color:var(--honey)}
+.mod-item.completed .mod-status{border-color:var(--ok)}
+.mod-label{flex:1;line-height:1.3}
+.mod-label span{display:block;font-size:10px;color:var(--g6);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1px}
+.progress-bar{margin:16px 20px 0;background:var(--g8);border-radius:100px;height:6px;overflow:hidden}
+.progress-fill{height:100%;background:var(--honey);border-radius:100px;transition:width .4s ease}
+.progress-text{font-size:11px;color:var(--g5);padding:6px 20px 0;text-align:center}
+
+/* MAIN CONTENT */
+.main{padding:40px;overflow-y:auto}
+@media(max-width:768px){.main{padding:24px 20px}}
+.lesson{max-width:760px}
+.lesson-num{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--hd);margin-bottom:8px}
+.lesson h1{font-size:clamp(24px,4vw,32px);font-weight:800;color:var(--bk);line-height:1.15;letter-spacing:-.02em;margin-bottom:20px}
+.lesson-content{font-size:15px;color:var(--g6);line-height:1.75}
+.lesson-content p{margin-bottom:16px;max-width:none}
+.lesson-content h3{font-size:18px;font-weight:700;color:var(--bk);margin:28px 0 10px}
+.lesson-content ul,.lesson-content ol{margin:12px 0 16px 24px}
+.lesson-content li{margin-bottom:6px}
+.lesson-content strong{color:var(--g8);font-weight:600}
+.lesson-content blockquote{border-left:3px solid var(--honey);padding:12px 20px;background:var(--h10);border-radius:0 8px 8px 0;margin:16px 0;font-style:italic;color:var(--g7)}
+.lesson-actions{display:flex;gap:10px;margin-top:32px;flex-wrap:wrap;padding-top:24px;border-top:1px solid var(--g1)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;border:none;border-radius:100px;transition:all .2s}
+.btn-p{background:var(--honey);color:var(--bk)}.btn-p:hover{background:var(--hl)}
+.btn-o{background:transparent;color:var(--g7);border:1px solid var(--g2)}.btn-o:hover{border-color:var(--honey);color:var(--hd)}
+.btn-dark{background:var(--bk);color:var(--wh)}.btn-dark:hover{background:var(--g8)}
+.btn-ok{background:var(--ok);color:#fff}.btn-ok:hover{background:#2f8559}
+.btn-next{background:var(--g8);color:var(--wh)}.btn-next:hover{background:var(--bk)}
+
+/* AUTH GATE */
+.auth-gate{background:var(--g05);border:1px solid var(--g1);border-radius:12px;padding:32px;text-align:center;margin:32px 0}
+.auth-gate h3{font-size:18px;font-weight:700;color:var(--bk);margin-bottom:8px}
+.auth-gate p{font-size:14px;color:var(--g6);margin-bottom:16px;max-width:420px;margin-left:auto;margin-right:auto}
+
+/* QUIZ */
+.quiz-wrap{margin-top:32px;background:var(--g05);border:1px solid var(--g1);border-radius:12px;padding:28px;display:none}
+.quiz-wrap.visible{display:block}
+.quiz-wrap h3{font-size:18px;font-weight:700;color:var(--bk);margin-bottom:16px}
+.quiz-q{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--g1)}
+.quiz-q:last-of-type{border-bottom:none}
+.quiz-q p{font-size:14px;font-weight:600;color:var(--bk);margin-bottom:10px}
+.quiz-opt{display:block;padding:10px 14px;margin:4px 0;border:1px solid var(--g1);border-radius:8px;font-size:13px;color:var(--g6);cursor:pointer;transition:all .15s;background:var(--wh)}
+.quiz-opt:hover{border-color:var(--honey);background:var(--h10)}
+.quiz-opt.selected{border-color:var(--honey);background:var(--h10);color:var(--bk);font-weight:600}
+.quiz-opt.correct{border-color:var(--ok);background:rgba(58,158,107,.08);color:var(--ok)}
+.quiz-opt.wrong{border-color:var(--err);background:rgba(217,79,79,.08);color:var(--err)}
+.quiz-explanation{font-size:13px;color:var(--g6);background:var(--wh);border-radius:8px;padding:10px 14px;margin-top:8px;border-left:3px solid var(--honey);display:none}
+.quiz-explanation.visible{display:block}
+.quiz-result{text-align:center;padding:20px;margin-top:16px;border-radius:8px;font-size:15px;font-weight:600;display:none}
+.quiz-result.visible{display:block}
+.quiz-result.pass{background:rgba(58,158,107,.08);color:var(--ok);border:1px solid rgba(58,158,107,.2)}
+.quiz-result.fail{background:rgba(217,79,79,.08);color:var(--err);border:1px solid rgba(217,79,79,.2)}
+.quiz-loading{text-align:center;padding:40px;color:var(--g5);font-size:14px}
+
+/* CHAT */
+.chat-section{margin-top:40px;border-top:1px solid var(--g1);padding-top:24px}
+.chat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.chat-header h3{font-size:16px;font-weight:700;color:var(--bk)}
+.chat-toggle{padding:6px 14px;font-size:12px;font-weight:600;border:1px solid var(--g2);border-radius:100px;background:var(--wh);cursor:pointer;color:var(--g6);transition:all .2s;font-family:var(--font)}
+.chat-toggle:hover{border-color:var(--honey);color:var(--hd)}
+.chat-box{display:none;border:1px solid var(--g1);border-radius:12px;overflow:hidden;background:var(--wh)}
+.chat-box.visible{display:block}
+.chat-messages{height:320px;overflow-y:auto;padding:16px;background:var(--g05)}
+.chat-msg{margin-bottom:12px;display:flex;gap:10px;align-items:flex-start}
+.chat-msg.user{flex-direction:row-reverse}
+.chat-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.chat-msg.assistant .chat-avatar{background:var(--h10);color:var(--hd)}
+.chat-msg.user .chat-avatar{background:var(--g8);color:var(--wh)}
+.chat-bubble{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6;max-width:80%}
+.chat-msg.assistant .chat-bubble{background:var(--wh);border:1px solid var(--g1);color:var(--g7)}
+.chat-msg.user .chat-bubble{background:var(--honey);color:var(--bk)}
+.chat-typing{display:none;padding:10px 14px;font-size:13px;color:var(--g5);font-style:italic}
+.chat-typing.visible{display:block}
+.chat-input-wrap{display:flex;border-top:1px solid var(--g1);background:var(--wh)}
+.chat-input{flex:1;border:none;padding:14px 16px;font-size:14px;font-family:var(--font);outline:none;background:transparent;color:var(--g8)}
+.chat-input::placeholder{color:var(--g4)}
+.chat-send{padding:14px 20px;background:var(--honey);color:var(--bk);border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .2s}
+.chat-send:hover{background:var(--hl)}
+.chat-send:disabled{opacity:.5;cursor:not-allowed}
+
+/* FOOTER */
+.ft{background:var(--bk);color:var(--g5);padding:24px 28px;font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="https://www.imbila.ai" class="nav-left"><img class="nav-mark" src="https://www.imbila.ai/content/images/2026/03/imbila-mark-traced.svg" alt="Imbila.AI"><span class="nav-name">Imbila<em>.AI</em></span></a>
+  <button class="mob" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+  <div class="nav-links"><a href="https://platform.imbila.ai">Home</a><a href="https://google.imbila.ai">Google Academy</a><a href="https://openai.imbila.ai">OpenAI Academy</a><a href="/" class="active">Claude Academy</a><a href="https://demo.imbila.ai">Demos</a><a href="https://imbila.ai" target="_blank">Blog</a><a href="/cdn-cgi/l/email-protection#244c4148484b644d49464d48450a454d" class="nav-cta">Contact</a></div>
+</nav>
+
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" title="Toggle modules">&#9776;</button>
+
+<div class="learn-wrap">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>Claude Academy</h3>
+      <p>AI Fluency Curriculum</p>
+    </div>
+    <ul class="mod-list" id="modList"></ul>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0"></div></div>
+    <div class="progress-text" id="progressText">0 / 10 completed</div>
+  </aside>
+
+  <main class="main">
+    <article class="lesson" id="lessonContent"></article>
+
+    <div class="quiz-wrap" id="quizWrap">
+      <h3>&#128221; Test Your Knowledge</h3>
+      <div id="quizContent"></div>
+      <div class="quiz-result" id="quizResult"></div>
+    </div>
+
+    <section class="chat-section" id="chatSection">
+      <div class="chat-header">
+        <h3>&#129302; AI Tutor</h3>
+        <button class="chat-toggle" id="chatToggle" onclick="toggleChat()">Open Chat</button>
+      </div>
+      <div class="chat-box" id="chatBox">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg assistant">
+            <div class="chat-avatar">AI</div>
+            <div class="chat-bubble">Welcome to the Claude Academy AI Tutor! I'm here to help you understand the 4D Framework. Ask me anything about the current module.</div>
+          </div>
+        </div>
+        <div class="chat-typing" id="chatTyping">AI Tutor is thinking&#8230;</div>
+        <div class="chat-input-wrap">
+          <input class="chat-input" id="chatInput" type="text" placeholder="Ask the AI Tutor a question&#8230;" onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" id="chatSend" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="ft">
+  &copy; 2026 Imbila.AI &#183; AI Fluency curriculum based on the 4D Framework by Prof. Feller &amp; Prof. Dakan with Anthropic &#183; Imbila.AI is not affiliated with Anthropic PBC
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+var MODULES = [
+  {
+    id: 'intro',
+    num: 'MODULE 01',
+    title: 'Introduction to AI Fluency',
+    content: '<p>Artificial Intelligence Fluency is the ability to work with AI systems effectively, efficiently, ethically, and safely. It is not about becoming a programmer or an AI researcher &#8212; it is about developing the practical competencies needed to collaborate with AI as a professional tool.</p><p>The concept was developed by Professor Joseph Feller of University College Cork and Professor Rick Dakan of Ringling College of Art and Design, in partnership with Anthropic. Their research, including the AI Fluency Index study of thousands of real Claude conversations, revealed that the most productive AI users share four distinct competencies &#8212; and that these competencies can be taught.</p><h3>Why AI Fluency Matters Now</h3><p>AI tools are already reshaping how knowledge work gets done. From drafting documents to analysing data, from brainstorming ideas to reviewing contracts, AI can assist with an enormous range of tasks. But the gap between using AI casually and using it effectively is significant. Research shows that 85.7% of the most effective AI conversations involve iteration and refinement &#8212; meaning the best outcomes come from skilled human-AI collaboration, not from typing a quick question and accepting the first answer.</p><p>For South African businesses particularly, AI fluency represents an opportunity to leapfrog traditional productivity barriers. Small and medium enterprises that develop these skills can compete with much larger organisations by using AI to augment their capabilities rather than trying to match headcount.</p><h3>What You Will Learn</h3><p>This curriculum covers the complete AI Fluency framework through ten progressive modules. By the end, you will be able to: decide which tasks are appropriate for AI collaboration; communicate effectively with AI systems to get high-quality results; critically evaluate AI output for accuracy and fitness for purpose; and use AI responsibly, ethically, and in accordance with your professional obligations.</p>'
+  },
+  {
+    id: '4d-overview',
+    num: 'MODULE 02',
+    title: 'The 4D Framework Overview',
+    content: '<p>The 4D Framework is the organising structure for AI Fluency. It defines four interconnected competencies that together enable effective, responsible AI collaboration: <strong>Delegation</strong>, <strong>Description</strong>, <strong>Discernment</strong>, and <strong>Diligence</strong>. Each competency builds on and reinforces the others.</p><h3>The Four Competencies</h3><p><strong>Delegation</strong> is about deciding what work to give to AI, what to keep for yourself, and what to do collaboratively. It requires understanding both the task at hand and the capabilities and limitations of AI systems.</p><p><strong>Description</strong> is the ability to communicate with AI in ways that produce high-quality results. This includes specifying what you want (product), how to approach it (process), and how the AI should behave (performance).</p><p><strong>Discernment</strong> is the critical evaluation of AI output. Can you tell when AI has produced something accurate versus something plausible but wrong? Can you identify gaps, errors, and hallucinations? This is the skill that separates effective AI users from risky ones.</p><p><strong>Diligence</strong> covers the ethical, legal, and professional responsibility dimensions of AI use. It encompasses data privacy, transparency about AI involvement, accuracy verification, and ensuring that AI use aligns with your values and obligations.</p><h3>How the Framework Works in Practice</h3><p>These four competencies are not sequential steps &#8212; they are an interconnected system. When you delegate a task to AI, you need good description skills to communicate it effectively. When you receive output, you need discernment to evaluate it. And diligence underpins everything, ensuring that the entire process is conducted responsibly.</p><p>Anthropic\'s research found that the most effective Claude conversations consistently demonstrate all four competencies. Users who excel in one area but neglect others produce significantly weaker outcomes. The framework is holistic by design.</p>'
+  },
+  {
+    id: 'delegation',
+    num: 'MODULE 03',
+    title: 'Delegation &#8212; What to Give AI',
+    content: '<p>Delegation is the first critical decision in any AI interaction: should this task involve AI at all, and if so, how? Effective delegation requires both domain expertise &#8212; you understand the work &#8212; and platform awareness &#8212; you understand what AI can and cannot do.</p><h3>Three Modes of AI Interaction</h3><p><strong>Automation</strong> is when AI handles a task largely independently, following rules you set. Sorting 2,000 emails by date and sender, converting a spreadsheet into a formatted report, or extracting key dates from a contract are automation tasks. The human sets the parameters and spot-checks the results.</p><p><strong>Augmentation</strong> is collaborative work where human and AI contribute complementary strengths. Drafting a business proposal where you provide strategy and AI helps with structure and language, or analysing survey data where AI identifies patterns and you interpret their significance. This is where most knowledge work with AI falls.</p><p><strong>Agency</strong> is when AI operates with significant autonomy within guardrails you establish. An AI system that monitors incoming correspondence and flags items requiring urgent attention, or one that automatically generates preliminary reports from recurring data. This mode requires the highest level of trust and oversight.</p><h3>The Decision Matrix</h3><p>Before involving AI in any task, consider: What is the risk if the output contains errors? How easily can I verify the result? Does the task require judgment that depends on context AI does not have? Is there sensitive data involved? Tasks where errors are low-risk and verification is straightforward &#8212; like summarising meeting notes &#8212; are excellent candidates for AI. Tasks where errors could be catastrophic &#8212; like final legal filings or medical diagnoses &#8212; require human leadership with AI in a supporting role only.</p><p>For South African businesses, delegation decisions must also consider data protection under POPIA, the maturity of AI tools for local context, and the specific professional obligations of your industry.</p>'
+  },
+  {
+    id: 'description',
+    num: 'MODULE 04',
+    title: 'Description &#8212; How to Communicate with AI',
+    content: '<p>Description is the art of communicating with AI systems in ways that produce the results you need. It is far more than writing a good prompt &#8212; it is a structured approach to defining what you want, how you want it approached, and how the AI should behave throughout the interaction.</p><h3>Product Description: What You Want</h3><p>Product description specifies the output. Be explicit about format (a bullet-point summary, a formal letter, a data table), audience (technical experts, a non-specialist client, a regulatory body), length (two paragraphs, one page, comprehensive), and domain constraints (South African law, IFRS accounting standards, your industry terminology).</p><p>The more precisely you describe the product, the less iteration you need. Instead of asking AI to "write something about our marketing strategy," describe exactly what you need: "Draft a one-page executive summary of our Q2 marketing results for the board. Focus on three campaigns, highlight ROI, and include recommendations for Q3. Tone should be confident but not overselling."</p><h3>Process Description: How to Approach It</h3><p>Process description tells AI how to work through the task. For complex work, break it into steps. For analysis, specify the sequence: "First identify the key issues. Then evaluate each against our criteria. Then rank them by priority. Finally, draft recommendations." This structured approach produces dramatically better results than leaving the AI to determine its own approach.</p><h3>Performance Description: How to Behave</h3><p>Performance description sets behavioural expectations. Tell AI to be conservative when uncertain, to flag assumptions, to maintain a specific tone, or to ask clarifying questions rather than guessing. For professional work, instructions like "If you are uncertain about a fact or figure, state your uncertainty explicitly rather than presenting a guess as fact" can prevent serious errors.</p>'
+  },
+  {
+    id: 'prompting',
+    num: 'MODULE 05',
+    title: 'Effective Prompting Techniques',
+    content: '<p>Effective prompting is the practical application of Description skills. Anthropic\'s curriculum identifies six core prompting techniques that consistently improve AI output quality. Each technique addresses a different aspect of the human-AI communication challenge.</p><h3>The Six Techniques</h3><p><strong>1. Provide Context:</strong> Tell AI what it needs to know. Specify the domain, the audience, relevant background, and any constraints. "I am a financial advisor preparing a retirement plan for a client aged 55 with R2.5 million in retirement savings" gives AI the foundation for relevant, accurate assistance.</p><p><strong>2. Show Examples:</strong> If you have a preferred format or style, show AI what good looks like. Providing a sample email, report structure, or data format gives AI a concrete target rather than an abstract instruction.</p><p><strong>3. Specify Output Constraints:</strong> Set boundaries on length, format, and structure. "Maximum two pages," "numbered paragraphs," "table with columns for Date, Amount, and Category" &#8212; these constraints channel AI\'s output into usable forms.</p><p><strong>4. Break Complex Tasks into Steps:</strong> Large tasks produce better results when decomposed. Instead of "analyse this data and write a report," try: "Step 1: Identify the three most significant trends. Step 2: For each trend, explain the likely causes. Step 3: Draft recommendations based on your analysis."</p><p><strong>5. Ask AI to Think First:</strong> Requesting reasoning before conclusions improves accuracy. "Before drafting your recommendation, outline the key factors you are considering and any trade-offs" encourages more thorough analysis.</p><p><strong>6. Define AI\'s Role:</strong> Setting a clear role shapes behaviour. "You are a meticulous proofreader" produces different output than "You are a creative brainstorming partner." Choose the role that matches your current need.</p><h3>The Meta-Technique</h3><p>Perhaps the most powerful technique: ask AI to help you write better prompts. "I need to review 200 customer complaints. Help me write an effective prompt that will categorise and prioritise them." AI can often suggest structures and specifications you would not have thought to include.</p>'
+  },
+  {
+    id: 'discernment',
+    num: 'MODULE 06',
+    title: 'Discernment &#8212; Evaluating AI Output',
+    content: '<p>Discernment is the most critical skill in AI fluency. Without it, even perfect delegation and description skills are dangerous, because you cannot tell whether the AI\'s output is actually correct, complete, and fit for purpose.</p><h3>Product Discernment: Is the Output Sound?</h3><p>Product discernment evaluates what AI produced. Is it accurate? Are the facts correct? Are citations real? Does the argument hold together logically? Are there internal contradictions? Has AI addressed the actual question or gone off on a tangent?</p><p>AI systems can produce output that sounds authoritative and reads fluently but contains significant errors. This is particularly dangerous because confidence in presentation does not correlate with accuracy of content. A beautifully structured argument built on a fabricated statistic is worse than no argument at all.</p><h3>Process Discernment: How Did AI Get There?</h3><p>Process discernment examines the AI\'s reasoning. Did it follow the steps you specified? Did it skip anything? Did it make assumptions that were not in your instructions? Did it "fill gaps" with invented information rather than flagging uncertainty?</p><p>Watch for AI that smooths over contradictions in source material, presents uncertain claims as established fact, or introduces reasoning steps that sound plausible but are not supported by the evidence you provided.</p><h3>Performance Discernment: Is AI Behaving as Instructed?</h3><p>Performance discernment checks whether AI maintained the behaviour you specified. If you asked it to be conservative, is it being conservative? If you asked it to flag uncertainty, is it flagging uncertainty? If you asked it to stay within a specific scope, has it wandered?</p><p>The feedback loop between discernment and description is essential. When output is not right, the answer is rarely to accept a poor result &#8212; it is to refine your description and try again. This iterative process is what Anthropic\'s research found in 85.7% of effective conversations.</p>'
+  },
+  {
+    id: 'dd-loop',
+    num: 'MODULE 07',
+    title: 'The Description-Discernment Loop',
+    content: '<p>The Description-Discernment Loop is the engine of effective AI collaboration. It is the iterative cycle where you describe what you need, evaluate what AI produces, refine your description based on what you learned, and continue until the output meets your standards. This is not a sign of failure &#8212; it is how skilled AI users work.</p><h3>How the Loop Works</h3><p>Start with your best initial description. Evaluate the output using your discernment skills. Identify what is right, what is wrong, and what is missing. Then refine your prompt: add specificity where the output was vague, correct misconceptions where the output went wrong, and provide additional context where the output missed the mark.</p><p>Each iteration should produce noticeably better results. If three or four iterations are not converging on a good outcome, it may signal that the task is not well-suited for AI, that you need to restructure your approach, or that the AI system lacks the capability for this particular task.</p><h3>Practical Loop Patterns</h3><p><strong>The Narrowing Pattern:</strong> Start broad, then narrow. Ask AI to generate a first draft, evaluate it, then ask for specific improvements. "The structure is good but the tone is too casual for this audience. Revise sections 2 and 4 to be more formal while keeping the same content."</p><p><strong>The Building Pattern:</strong> Work in layers. Ask AI to outline first, review the outline, then expand section by section. This gives you control points at each stage and prevents investing time in a detailed draft built on a flawed structure.</p><p><strong>The Challenging Pattern:</strong> Ask AI to critique its own work. "Review what you just produced. What are the three weakest points? What assumptions did you make that I should verify?" This leverages AI\'s analytical capability against its own output.</p><p>South African professionals have found the loop particularly valuable for tasks involving local context, where the first AI output may use international conventions or miss jurisdiction-specific requirements. The refinement cycle is where you inject your expertise and local knowledge.</p>'
+  },
+  {
+    id: 'diligence',
+    num: 'MODULE 08',
+    title: 'Diligence &#8212; Ethics, Accuracy, and Responsibility',
+    content: '<p>Diligence is the responsibility framework that ensures AI is used ethically, accurately, and in accordance with professional obligations. It is not an afterthought &#8212; it should inform every AI interaction from the moment you decide to involve AI in a task.</p><h3>Creation Diligence: Choosing and Using AI Responsibly</h3><p>What data are you providing to AI systems? Where is that data processed and stored? Does the AI provider train on your inputs? These questions matter enormously for professional work. Under POPIA, South African businesses have specific obligations regarding personal information processing. Providing client data to an AI system without appropriate safeguards could constitute a breach.</p><p>Choose platforms deliberately. Enterprise AI tools typically offer stronger data governance than consumer versions. Understand the difference between AI providers that do and do not train on your conversations. For sensitive professional work, this distinction matters.</p><h3>Transparency Diligence: Being Honest About AI\'s Role</h3><p>When and how should you disclose that AI assisted in producing a document, analysis, or recommendation? The answer varies by profession and context, but the trend globally is toward greater transparency. Some professions are beginning to require disclosure; others encourage it as best practice.</p><p>In South African business, transparent AI use builds trust. Clients and stakeholders who understand that AI was used as a tool &#8212; and that human expertise guided and verified the output &#8212; are generally supportive. Concealing AI involvement, especially when it later comes to light, erodes trust disproportionately.</p><h3>Deployment Diligence: You Own the Output</h3><p>The fundamental principle of diligence is this: if your name goes on a document, you are responsible for its contents, regardless of whether AI assisted in producing it. AI is a tool. The professional who uses the tool bears responsibility for the result. This means verification is not optional. Every AI-assisted output that will be shared, published, or acted upon must be reviewed by a qualified human who takes ownership of its accuracy and appropriateness.</p>'
+  },
+  {
+    id: 'claude-101',
+    num: 'MODULE 09',
+    title: 'Claude 101 &#8212; Features and Capabilities',
+    content: '<p>Claude is Anthropic\'s AI assistant, designed to be helpful, harmless, and honest. Understanding its specific features and capabilities helps you use it more effectively within the 4D Framework you have learned.</p><h3>Core Capabilities</h3><p>Claude excels at extended analysis and reasoning across long documents. Its context window allows it to process entire contracts, lengthy reports, multi-page datasets, and complex briefs in a single conversation. This is particularly valuable for professional work where understanding the whole picture is essential &#8212; you can upload an entire document rather than pasting fragments.</p><p>Claude is strong at following structured, multi-step instructions &#8212; exactly the kind of process descriptions that produce the best results. Complex prompts with numbered steps, specific output formats, and behavioural instructions are where Claude particularly shines compared to more casual AI interactions.</p><h3>Projects and Persistent Context</h3><p>Claude\'s Projects feature allows you to create workspaces with standing instructions. For example, a project called "Client Correspondence" could include instructions like "Always use formal business English. Reference South African legislation where relevant. Flag any claims you are uncertain about." Every conversation within that project inherits these instructions, saving you from repeating context each time.</p><h3>Responsible Design</h3><p>Claude is designed to be conservative &#8212; it tends to flag uncertainty rather than fabricate answers. This is a deliberate design choice that makes it particularly suitable for professional work where confidence must be earned, not assumed. When Claude says "I am not certain about this," it is providing valuable information that a more aggressive AI might mask with confident-sounding but unreliable output.</p><p>Anthropic does not train on conversations from paid plans (Claude Pro, Team, Enterprise). This data handling approach is important for professional contexts involving client confidentiality, proprietary information, or sensitive business data.</p>'
+  },
+  {
+    id: 'api',
+    num: 'MODULE 10',
+    title: 'Building with the Claude API',
+    content: '<p>For organisations ready to integrate AI capabilities directly into their products, services, or internal tools, the Claude API provides programmatic access to Claude\'s capabilities. This module introduces the concepts &#8212; building production applications requires the full Anthropic developer course.</p><h3>What the API Enables</h3><p>The API allows you to build AI-powered features into your own applications. A South African fintech company might use the API to power an automated document review system. A consulting firm might build an internal knowledge assistant that draws on their proprietary frameworks. An e-commerce business might integrate AI-powered customer support that understands their specific product catalogue.</p><p>Unlike using Claude through the web interface, the API gives you control over system prompts, conversation management, output formatting, and integration with your existing systems. This is the path from individual AI productivity to organisational AI capability.</p><h3>Key Concepts</h3><p><strong>System Prompts:</strong> Persistent instructions that shape every interaction. Unlike project instructions in the web interface, API system prompts can be dynamically generated based on the user, context, or task.</p><p><strong>Streaming:</strong> For user-facing applications, streaming responses word by word creates a responsive experience rather than waiting for the complete response. This is how most chat interfaces work.</p><p><strong>Structured Output:</strong> The API can return responses in specific formats (JSON, structured data) that your application can process programmatically. This is essential for integrating AI output into automated workflows.</p><h3>From AI Fluency to AI Strategy</h3><p>The 4D Framework applies to API usage too. Delegation decisions determine which features to AI-power. Description skills shape your system prompts and prompt engineering. Discernment informs your quality assurance and evaluation processes. Diligence guides your data handling, user consent, and transparency practices.</p><p>The transition from individual AI fluency to organisational AI strategy is where Imbila\'s consulting and implementation support becomes particularly valuable. Building AI into products and processes requires not just technical capability but strategic clarity about where AI adds genuine value.</p>'
+  }
+];
+
+var currentModule = 0;
+var chatHistory = [];
+// Open access: all 10 modules, AI tutor and quizzes are free. No sign-in required.
+var isAuthenticated = true;
+
+// Auth gate removed — kept as a no-op so callers don't error.
+async function checkAuth() { /* open access */ }
+
+function getProgress() {
+  try {
+    var p = JSON.parse(localStorage.getItem('claude_academy_progress') || '{}');
+    return p;
+  } catch(e) { return {}; }
+}
+
+function saveProgress(moduleId, completed) {
+  var p = getProgress();
+  p[moduleId] = completed;
+  localStorage.setItem('claude_academy_progress', JSON.stringify(p));
+}
+
+function renderSidebar() {
+  var list = document.getElementById('modList');
+  var progress = getProgress();
+  var completedCount = 0;
+  var html = '';
+
+  for (var i = 0; i < MODULES.length; i++) {
+    var m = MODULES[i];
+    var isActive = i === currentModule;
+    var isCompleted = progress[m.id] === true;
+    if (isCompleted) completedCount++;
+
+    var cls = 'mod-item';
+    if (isActive) cls += ' active';
+    if (isCompleted) cls += ' completed';
+
+    html += '<li class="' + cls + '" onclick="selectModule(' + i + ')">';
+    html += '<div class="mod-status">' + (isCompleted ? '&#10003;' : (i + 1)) + '</div>';
+    html += '<div class="mod-label"><span>' + m.num + '</span>' + m.title + '</div>';
+    html += '</li>';
+  }
+
+  list.innerHTML = html;
+
+  var pct = Math.round((completedCount / MODULES.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = completedCount + ' / ' + MODULES.length + ' completed';
+}
+
+function renderLesson() {
+  var m = MODULES[currentModule];
+  var progress = getProgress();
+  var isCompleted = progress[m.id] === true;
+  var needsAuth = !isAuthenticated && currentModule > 1;
+
+  var html = '<div class="lesson-num">' + m.num + '</div>';
+  html += '<h1>' + m.title + '</h1>';
+
+  if (needsAuth) {
+    html += '<div class="auth-gate">';
+    html += '<h3>&#128274; Sign in to continue learning</h3>';
+    html += '<p>Modules 1 and 2 are available freely. Sign in with your Imbila.AI account to access all 10 modules, AI tutoring, and practice assessments.</p>';
+    html += '<a href="#" onclick="ImbilaAuth.signIn();return false;" class="btn btn-p">Sign in to continue</a>';
+    html += '</div>';
+  } else {
+    html += '<div class="lesson-content">' + m.content + '</div>';
+    html += '<div class="lesson-actions">';
+    if (!isCompleted) {
+      html += '<button class="btn btn-o" onclick="startQuiz()">&#128221; Test Your Knowledge</button>';
+    } else {
+      html += '<span style="display:inline-flex;align-items:center;gap:6px;color:var(--ok);font-size:14px;font-weight:600">&#10003; Module completed</span>';
+    }
+    html += '<button class="btn btn-p" onclick="startQuiz()">&#128221; ' + (isCompleted ? 'Retake Quiz' : 'Test Your Knowledge') + '</button>';
+    if (currentModule < MODULES.length - 1) {
+      html += '<button class="btn btn-next" onclick="selectModule(' + (currentModule + 1) + ')">Next Module &#8594;</button>';
+    }
+    html += '</div>';
+  }
+
+  document.getElementById('lessonContent').innerHTML = html;
+
+  // Hide quiz
+  var qw = document.getElementById('quizWrap');
+  qw.classList.remove('visible');
+  qw.querySelector('#quizContent').innerHTML = '';
+  document.getElementById('quizResult').className = 'quiz-result';
+  document.getElementById('quizResult').textContent = '';
+
+  // Reset chat
+  document.getElementById('chatBox').classList.remove('visible');
+  document.getElementById('chatToggle').textContent = 'Open Chat';
+
+  // Show/hide chat for auth gate
+  document.getElementById('chatSection').style.display = needsAuth ? 'none' : 'block';
+
+  window.scrollTo(0, 0);
+}
+
+window.selectModule = function(idx) {
+  currentModule = idx;
+  chatHistory = [];
+  renderSidebar();
+  renderLesson();
+  resetChatMessages();
+  // Close sidebar on mobile
+  document.querySelector('.sidebar').classList.remove('open');
+};
+
+function resetChatMessages() {
+  var m = MODULES[currentModule];
+  document.getElementById('chatMessages').innerHTML =
+    '<div class="chat-msg assistant"><div class="chat-avatar">AI</div><div class="chat-bubble">Welcome! I\'m your AI tutor for <strong>' + m.title + '</strong>. Ask me anything about this module &#8212; I\'ll give you practical examples and help you understand the concepts.</div></div>';
+}
+
+window.toggleChat = function() {
+  var box = document.getElementById('chatBox');
+  var btn = document.getElementById('chatToggle');
+  if (box.classList.contains('visible')) {
+    box.classList.remove('visible');
+    btn.textContent = 'Open Chat';
+  } else {
+    box.classList.add('visible');
+    btn.textContent = 'Close Chat';
+  }
+};
+
+window.sendChat = async function() {
+  var input = document.getElementById('chatInput');
+  var msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  var m = MODULES[currentModule];
+
+  // Add user message
+  addChatMessage('user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+
+  // Show typing
+  document.getElementById('chatTyping').classList.add('visible');
+  document.getElementById('chatSend').disabled = true;
+
+  // Check balance before calling AI
+  if (window.ImbilaAuth) {
+    try {
+      var balance = await ImbilaAuth.getBalance();
+      if (balance <= 0) {
+        ImbilaAuth._showDepletedPrompt();
+        document.getElementById('chatTyping').classList.remove('visible');
+        document.getElementById('chatSend').disabled = false;
+        return;
+      }
+    } catch(e) {}
+  }
+
+  fetch('/api/tutor', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: msg,
+      module: m.title,
+      history: chatHistory.slice(-8)
+    })
+  }).then(function(res) {
+    if (!res.ok) throw new Error('Request failed');
+    var reader = res.body.getReader();
+    var decoder = new TextDecoder();
+    var fullResponse = '';
+    var bubbleEl = addChatMessage('assistant', '');
+
+    function read() {
+      reader.read().then(function(result) {
+        if (result.done) {
+          document.getElementById('chatTyping').classList.remove('visible');
+          document.getElementById('chatSend').disabled = false;
+          chatHistory.push({ role: 'assistant', content: fullResponse });
+          // Deduct tokens for tutor usage
+          if (window.ImbilaAuth) {
+            ImbilaAuth.deductTokens(500, '@cf/meta/llama-3.3-70b-instruct-fp8-fast', 'claude-academy', 'AI tutor: ' + m.title);
+          }
+          return;
+        }
+        var chunk = decoder.decode(result.value, { stream: true });
+        // Parse SSE data
+        var lines = chunk.split('\n');
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i].trim();
+          if (line.startsWith('data: ')) {
+            var data = line.slice(6);
+            if (data === '[DONE]') continue;
+            try {
+              var parsed = JSON.parse(data);
+              if (parsed.response) {
+                fullResponse += parsed.response;
+                bubbleEl.textContent = fullResponse;
+                scrollChat();
+              }
+            } catch(e) {
+              // If not JSON, treat as plain text
+              fullResponse += data;
+              bubbleEl.textContent = fullResponse;
+              scrollChat();
+            }
+          }
+        }
+        read();
+      });
+    }
+    read();
+  }).catch(function(err) {
+    document.getElementById('chatTyping').classList.remove('visible');
+    document.getElementById('chatSend').disabled = false;
+    addChatMessage('assistant', 'Sorry, I was unable to connect to the AI tutor service. Please try again in a moment.');
+  });
+};
+
+function addChatMessage(role, text) {
+  var container = document.getElementById('chatMessages');
+  var div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+
+  var avatar = document.createElement('div');
+  avatar.className = 'chat-avatar';
+  avatar.textContent = role === 'user' ? 'You' : 'AI';
+
+  var bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.textContent = text;
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  container.appendChild(div);
+  scrollChat();
+  return bubble;
+}
+
+function scrollChat() {
+  var c = document.getElementById('chatMessages');
+  c.scrollTop = c.scrollHeight;
+}
+
+window.startQuiz = async function() {
+  var m = MODULES[currentModule];
+  var qw = document.getElementById('quizWrap');
+  var qc = document.getElementById('quizContent');
+  var qr = document.getElementById('quizResult');
+
+  // Check balance before calling AI
+  if (window.ImbilaAuth) {
+    try {
+      var balance = await ImbilaAuth.getBalance();
+      if (balance <= 0) {
+        ImbilaAuth._showDepletedPrompt();
+        return;
+      }
+    } catch(e) {}
+  }
+
+  qw.classList.add('visible');
+  qr.className = 'quiz-result';
+  qr.textContent = '';
+  qc.innerHTML = '<div class="quiz-loading">Generating questions for <strong>' + m.title + '</strong>&#8230;</div>';
+
+  qw.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  fetch('/api/assess', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ module: m.title })
+  }).then(function(res) { return res.json(); })
+  .then(function(data) {
+    var questions = data.questions || [];
+    if (questions.length === 0) {
+      qc.innerHTML = '<p style="color:var(--g5)">Unable to generate quiz. Please try again.</p>';
+      return;
+    }
+    renderQuiz(questions);
+    // Deduct tokens for assessment
+    if (window.ImbilaAuth) {
+      ImbilaAuth.deductTokens(300, '@cf/meta/llama-3.3-70b-instruct-fp8-fast', 'claude-academy', 'Assessment: ' + m.title);
+    }
+  }).catch(function() {
+    qc.innerHTML = '<p style="color:var(--g5)">Unable to connect to the assessment service. Please try again.</p>';
+  });
+};
+
+function renderQuiz(questions) {
+  var qc = document.getElementById('quizContent');
+  var html = '';
+  for (var i = 0; i < questions.length; i++) {
+    var q = questions[i];
+    html += '<div class="quiz-q" data-correct="' + q.correct + '">';
+    html += '<p>Q' + (i+1) + '. ' + escapeHtml(q.question) + '</p>';
+    for (var j = 0; j < q.options.length; j++) {
+      html += '<label class="quiz-opt" data-q="' + i + '" data-opt="' + j + '" onclick="selectOpt(this,' + i + ',' + j + ')">' + escapeHtml(q.options[j]) + '</label>';
+    }
+    html += '<div class="quiz-explanation" id="expl-' + i + '">' + escapeHtml(q.explanation) + '</div>';
+    html += '</div>';
+  }
+  html += '<div style="text-align:center;margin-top:16px"><button class="btn btn-ok" onclick="submitQuiz()">Submit Answers</button></div>';
+
+  qc.innerHTML = html;
+  window._quizData = questions;
+  window._quizAnswers = {};
+}
+
+window.selectOpt = function(el, q, opt) {
+  // Deselect others in same question
+  var opts = document.querySelectorAll('[data-q="' + q + '"]');
+  for (var i = 0; i < opts.length; i++) {
+    opts[i].classList.remove('selected');
+  }
+  el.classList.add('selected');
+  window._quizAnswers[q] = opt;
+};
+
+window.submitQuiz = function() {
+  var questions = window._quizData;
+  if (!questions) return;
+
+  var correct = 0;
+  for (var i = 0; i < questions.length; i++) {
+    var answer = window._quizAnswers[i];
+    var opts = document.querySelectorAll('[data-q="' + i + '"]');
+
+    // Show correct/wrong
+    for (var j = 0; j < opts.length; j++) {
+      opts[j].style.pointerEvents = 'none';
+      if (j === questions[i].correct) {
+        opts[j].classList.add('correct');
+      } else if (j === answer && j !== questions[i].correct) {
+        opts[j].classList.add('wrong');
+      }
+    }
+
+    // Show explanation
+    var expl = document.getElementById('expl-' + i);
+    if (expl) expl.classList.add('visible');
+
+    if (answer === questions[i].correct) correct++;
+  }
+
+  var pct = Math.round((correct / questions.length) * 100);
+  var passed = pct >= 75;
+
+  var qr = document.getElementById('quizResult');
+  qr.className = 'quiz-result visible ' + (passed ? 'pass' : 'fail');
+  qr.textContent = passed
+    ? 'Congratulations! You scored ' + correct + '/' + questions.length + ' (' + pct + '%). Module marked as complete.'
+    : 'You scored ' + correct + '/' + questions.length + ' (' + pct + '%). You need 75% to pass. Review the material and try again.';
+
+  if (passed) {
+    saveProgress(MODULES[currentModule].id, true);
+    renderSidebar();
+  }
+};
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Init
+(async function() {
+  await checkAuth();
+  renderSidebar();
+  renderLesson();
+})();
+
+})();
+</script>
+</body>
+</html>
