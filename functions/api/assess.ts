@@ -1,75 +1,98 @@
-// POST /api/assess — AI-generated quiz for Imbila.AI Claude Academy modules
-// Returns structured JSON quiz questions
+// POST /api/assess — serves a human-vetted quiz for Imbila.AI Claude Academy modules.
+// Questions come from the committed, reviewed quiz-bank.json (NOT generated live by AI),
+// so the answer key is trustworthy and grading is deterministic. We serve a randomised
+// subset per attempt and shuffle the options (remapping the correct index) for integrity.
 
-interface Env {
-  AI: any;
-}
+import quizBank from "../../quiz-bank.json";
 
 interface AssessRequest {
-  module: string;
+  module?: string;
+  moduleId?: string;
 }
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+type BankQuestion = { q: string; options: string[]; correct: number; explanation: string };
+
+const QUESTIONS_PER_ATTEMPT =
+  (quizBank as any)._meta?.questionsServedPerAttempt || 4;
+
+// Fallback: map a module *title* to its bank id (the client normally sends moduleId).
+const TITLE_TO_ID: Record<string, string> = {
+  "introduction to ai fluency": "intro",
+  "the 4d framework overview": "4d-overview",
+  "delegation": "delegation",
+  "description": "description",
+  "effective prompting techniques": "prompting",
+  "discernment": "discernment",
+  "the description-discernment loop": "dd-loop",
+  "diligence": "diligence",
+  "claude 101": "claude-101",
+  "building with the claude api": "api",
+};
+
+function resolveId(body: AssessRequest): string | null {
+  if (body.moduleId && (quizBank as any)[body.moduleId]) return body.moduleId;
+  if (body.module) {
+    const t = body.module.replace(/&#8212;|—/g, "").replace(/&amp;/g, "&").toLowerCase().trim();
+    if ((quizBank as any)[t]) return t;
+    // match on the leading keyword(s) before any dash
+    const head = t.split(/[-–—:]/)[0].trim();
+    for (const [title, id] of Object.entries(TITLE_TO_ID)) {
+      if (t.startsWith(title) || title.startsWith(head) || head.startsWith(title)) return id;
+    }
+  }
+  return null;
+}
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+export const onRequestPost: PagesFunction = async (context) => {
   let body: AssessRequest;
   try {
     body = await context.request.json();
   } catch {
-    return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
+    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { module } = body;
+  const id = resolveId(body);
+  const pool: BankQuestion[] = id ? ((quizBank as any)[id] as BankQuestion[]) : [];
 
-  if (!module || typeof module !== 'string') {
-    return Response.json({ error: 'module is required and must be a string' }, { status: 400 });
+  if (!pool || pool.length === 0) {
+    return Response.json(
+      { questions: [], error: "No vetted quiz is available for this module yet." },
+      { status: 200 }
+    );
   }
 
-  const systemPrompt = `Generate a quiz for the Claude Academy AI Fluency module: ${module}. Return ONLY valid JSON: {"questions": [{"question": "...", "options": ["A. ...", "B. ...", "C. ...", "D. ..."], "correct": 0, "explanation": "..."}]}. 4 questions testing practical understanding of AI fluency, the 4D Framework (Delegation, Description, Discernment, Diligence), and working with Claude.`;
+  // Pick a random subset, then shuffle each question's options and remap the correct index.
+  const picked = shuffle(pool).slice(0, Math.min(QUESTIONS_PER_ATTEMPT, pool.length));
+  const questions = picked.map((item) => {
+    const tagged = item.options.map((text, i) => ({ text, isCorrect: i === item.correct }));
+    const shuffled = shuffle(tagged);
+    return {
+      question: item.q,
+      options: shuffled.map((o) => o.text),
+      correct: shuffled.findIndex((o) => o.isCorrect),
+      explanation: item.explanation,
+    };
+  });
 
-  try {
-    const result = await context.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Generate a 4-question quiz for the module: ${module}` },
-      ],
-      max_tokens: 1024,
-    });
-
-    const responseText = result.response || '';
-
-    // Try to parse JSON from the response
-    let quiz;
-    try {
-      // Try direct parse first
-      quiz = JSON.parse(responseText);
-    } catch {
-      // Try to extract JSON from markdown code blocks or surrounding text
-      const jsonMatch = responseText.match(/\{[\s\S]*"questions"[\s\S]*\}/);
-      if (jsonMatch) {
-        quiz = JSON.parse(jsonMatch[0]);
-      } else {
-        return Response.json({
-          error: 'Failed to generate valid quiz format',
-          raw: responseText,
-        }, { status: 502 });
-      }
-    }
-
-    return Response.json(quiz);
-  } catch (err: any) {
-    return Response.json({
-      error: 'Assessment generation failed',
-      detail: err.message || 'Unknown error',
-    }, { status: 502 });
-  }
+  return Response.json({ questions, source: "vetted" });
 };
 
-// Handle CORS preflight
+// CORS preflight
 export const onRequestOptions: PagesFunction = async () => {
   return new Response(null, {
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
     },
   });
 };

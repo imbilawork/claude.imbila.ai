@@ -511,14 +511,14 @@ window.startQuiz = async function() {
   qw.classList.add('visible');
   qr.className = 'quiz-result';
   qr.textContent = '';
-  qc.innerHTML = '<div class="quiz-loading">Generating questions for <strong>' + m.title + '</strong>&#8230;</div>';
+  qc.innerHTML = '<div class="quiz-loading">Loading questions for <strong>' + m.title + '</strong>&#8230;</div>';
 
   qw.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   fetch('/api/assess', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ module: m.title })
+    body: JSON.stringify({ module: m.title, moduleId: m.id })
   }).then(function(res) { return res.json(); })
   .then(function(data) {
     var questions = data.questions || [];
