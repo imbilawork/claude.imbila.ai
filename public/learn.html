@@ -318,9 +318,7 @@ function renderLesson() {
   } else {
     html += '<div class="lesson-content">' + m.content + '</div>';
     html += '<div class="lesson-actions">';
-    if (!isCompleted) {
-      html += '<button class="btn btn-o" onclick="startQuiz()">&#128221; Test Your Knowledge</button>';
-    } else {
+    if (isCompleted) {
       html += '<span style="display:inline-flex;align-items:center;gap:6px;color:var(--ok);font-size:14px;font-weight:600">&#10003; Module completed</span>';
     }
     html += '<button class="btn btn-p" onclick="startQuiz()">&#128221; ' + (isCompleted ? 'Retake Quiz' : 'Test Your Knowledge') + '</button>';
